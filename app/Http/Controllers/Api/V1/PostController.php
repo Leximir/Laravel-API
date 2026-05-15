@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\StorePostRequest;
 use App\Models\Post;
 use Illuminate\Http\Request;
 
@@ -13,18 +14,15 @@ class PostController extends Controller
      */
     public function index()
     {
-        return 'indexV1';
+        return Post::all();
     }
 
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(StorePostRequest $request)
     {
-        $data = $request->validate([
-            'title' => ['required', 'string', 'min:2'],
-            'body' => ['required', 'string', 'min:2'],
-        ]);
+        $data = $request->validated();
         $data['author_id'] = 1;
 
         $post = Post::create($data);
@@ -34,33 +32,30 @@ class PostController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+    public function show(Post $post)
     {
-        return response()->json([
-            'id' => 1,
-            'title' => 'Test',
-            'body' => 'Post body'
-        ]);
+        $post = Post::findOrFail($id);
+
+        return response()->json($post);
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(Request $request, Post $post)
     {
-        $data = $request->validate([
-            'title' => ['required', 'string', 'min:2'],
-            'body' => ['required', 'string', 'min:2'],
-        ]);
 
-        return $data;
+        $post->update($data);
+
+        return $post;
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(Post $post)
     {
+        $post->delete();
         return response()->noContent();
     }
 }
