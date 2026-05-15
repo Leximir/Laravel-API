@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Controller;
+use App\Models\Post;
 use Illuminate\Http\Request;
 
 class PostController extends Controller
@@ -20,12 +21,14 @@ class PostController extends Controller
      */
     public function store(Request $request)
     {
-        $data = $request->only('title', 'body');
-        return response()->json([
-            'id' => 1,
-            'title' => $data['title'],
-            'body' => $data['body']
-        ], 201);
+        $data = $request->validate([
+            'title' => ['required', 'string', 'min:2'],
+            'body' => ['required', 'string', 'min:2'],
+        ]);
+        $data['author_id'] = 1;
+
+        $post = Post::create($data);
+        return response()->json($post, 201);
     }
 
     /**
